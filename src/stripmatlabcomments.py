@@ -6,13 +6,16 @@ from enum import Enum
 
 def main(arg_obj):
     stripper = MatlabCommentStripper(arg_obj.mark)
+
     if arg_obj.string:
         istr_lines = arg_obj.string.split('\n')
     else:
-        istr_lines = stripper.read_from(arg_obj.ifile)
+        istr_lines = read_from(arg_obj.ifile)
+
     ostr = stripper.strip_lines(istr_lines)
+
     if arg_obj.ofile:
-        stripper.write_to(arg_obj.ofile, ostr)
+        write_to(arg_obj.ofile, ostr)
     else:
         print(ostr)
 
@@ -93,6 +96,7 @@ class MatlabCommentStripper:
             line = istr_lines[line_num]
             next_line = istr_lines[line_num +
                                    1] if line_num + 1 < max_line else None
+
             # if multiline comment started
             if self.start_multiline_regex.match(line):
                 # if already deleting comments or this comment should be deleted
@@ -113,11 +117,13 @@ class MatlabCommentStripper:
                     comment_line_nums.append(out_line_num)
                     out.append(line)
                     continue
+
             if content_stack[-1] == MultilineState.DELETE:
                 continue
             elif content_stack[-1] == MultilineState.COMMENT:
                 comment_line_nums.append(out_line_num)
             out.append(line)
+
         return out, comment_line_nums
 
     def strip_line_comments(self, istr_lines: list, line_nums_to_omit: list) -> list:
@@ -127,6 +133,7 @@ class MatlabCommentStripper:
             deletion_mark = '%' + self.deletion_mark + ' '
         else:
             deletion_mark = '%'
+
         for i, line in enumerate(istr_lines):
             if i in line_nums_to_omit or line.isspace():
                 out.append(line)
@@ -135,35 +142,37 @@ class MatlabCommentStripper:
             code = match.group("code")
             comment = match.group("comment")
             # if comment starts with deletion mark, delete it
+
             if comment[:len(deletion_mark)] == deletion_mark:
                 # if comment is deleted and there is no code, don't append line
                 if re.match(r"^\s*$", code):
                     continue
                 comment = '\n'
             out.append(code + comment)
+
         return out
-
-    @staticmethod
-    def read_from(file_path: str) -> str:
-        try:
-            with open(file_path, 'r') as file:
-                return file.readlines()
-        except OSError as e:
-            print(e)
-            exit(e.errno)
-
-    @staticmethod
-    def write_to(file_path: str, content) -> None:
-        try:
-            with open(file_path, 'w') as file:
-                file.write(content)
-        except OSError as e:
-            print(e)
-            exit(e.errno)
 
 
 # delete variables from file scope
 del line_regex_str, line_regex, start_multiline_regex, end_multiline_regex
+
+
+def read_from(file_path: str) -> str:
+    try:
+        with open(file_path, 'r') as file:
+            return file.readlines()
+    except OSError as e:
+        print(e)
+        exit(e.errno)
+
+
+def write_to(file_path: str, content) -> None:
+    try:
+        with open(file_path, 'w') as file:
+            file.write(content)
+    except OSError as e:
+        print(e)
+        exit(e.errno)
 
 
 if __name__ == "__main__":
