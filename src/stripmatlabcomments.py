@@ -141,8 +141,8 @@ class MatlabCommentStripper:
             match = self.line_regex.match(line)
             code = match.group("code")
             comment = match.group("comment")
-            # if comment starts with deletion mark, delete it
 
+            # if comment starts with deletion mark, delete it
             if comment[:len(deletion_mark)] == deletion_mark:
                 # if comment is deleted and there is no code, don't append line
                 if re.match(r"^\s*$", code):
@@ -176,10 +176,8 @@ def write_to(file_path: str, content) -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="")
-    parser.add_argument("-m", "--mark", metavar="DeletionMark",
-                        help="specify mark which will qualify a comment to be deleted; "
-                        "deletes all comments if absent")
+    parser = argparse.ArgumentParser(
+        description="Delete comments from MATLAB code.")
     ex_group = parser.add_mutually_exclusive_group(required=True)
     ex_group.add_argument("-s", "--string", metavar="InputString",
                           help="directly pass string to be processed")
@@ -187,6 +185,9 @@ if __name__ == "__main__":
                           help="specify file to be processed")
     parser.add_argument("-o", "--ofile", metavar="OutputFile",
                         help="specify output file; prints result if absent")
+    parser.add_argument("-m", "--mark", metavar="DeletionMark",
+                        help="specify mark which will qualify a comment to be deleted; "
+                        "deletes all comments if absent")
     if len(sys.argv) < 2:
         parser.print_help()
     else:

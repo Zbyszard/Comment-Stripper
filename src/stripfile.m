@@ -26,11 +26,11 @@ function [status, errmsg] = stripfile(inputFile, outputFile, deletionMark)
             error("Argument %d is not a string", ii);
         end
     end
-    stripperPath = which("stripmatlabcomments.py");
-    if isempty(stripperPath)
+    scriptPath = which("stripmatlabcomments.py");
+    if isempty(scriptPath)
         error("Python script not found");
     end
-    command = sprintf('python "%s" -i "%s" -o "%s"', stripperPath,...
+    command = sprintf('python "%s" -i "%s" -o "%s"', scriptPath,...
         inputFile, outputFile);
     if ~isempty(deletionMark)
         if ispc
