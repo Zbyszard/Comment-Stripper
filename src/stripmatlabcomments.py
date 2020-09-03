@@ -7,13 +7,16 @@ from enum import Enum
 def main(arg_obj):
     stripper = MatlabCommentStripper(arg_obj.mark)
 
+    # get lines from argument or from file
     if arg_obj.string:
         istr_lines = arg_obj.string.split('\n')
     else:
         istr_lines = read_from(arg_obj.ifile)
 
+    # strip comments
     ostr = stripper.strip_lines(istr_lines)
 
+    # write to file or print
     if arg_obj.ofile:
         write_to(arg_obj.ofile, ostr)
     else:
@@ -55,9 +58,13 @@ start_multiline_regex = re.compile(r"^\s*%{\s*\n?$")
 end_multiline_regex = re.compile(r"^\s*%}\s*\n?$")
 
 
-class MultilineState(Enum):
+class LineCheckingState(Enum):
+    """enum class for processing multiline comments"""
+    # currently processing code
     CODE = 0
+    # currently processing muliline comment not marked for deletion
     COMMENT = 1
+    # currently deleting comments
     DELETE = 2
 
 
@@ -77,21 +84,19 @@ class MatlabCommentStripper:
 
     def strip_multiline_comments(self, istr_lines: list) -> (list, list):
         """returns list of lines and a list of numbers of lines being multiline comments"""
-        # output
+        
         out = []
         # numbers of every line being a multiline comment
         comment_line_nums = []
         # number of current output line
         out_line_num = -1
-        # top element tells if current line contains
-        # code, comment or comment that should be deleted
-        content_stack = [MultilineState.CODE]
+        processing_stack = [LineCheckingState.CODE]
 
         line_num = -1
         max_line = len(istr_lines) - 1
         while line_num < max_line:
             line_num += 1
-            if content_stack[-1] != MultilineState.DELETE:
+            if processing_stack[-1] != LineCheckingState.DELETE:
                 out_line_num += 1
             line = istr_lines[line_num]
             next_line = istr_lines[line_num +
@@ -99,36 +104,38 @@ class MatlabCommentStripper:
 
             # if multiline comment started
             if self.start_multiline_regex.match(line):
-                # if already deleting comments or this comment should be deleted
-                if content_stack[-1] == MultilineState.DELETE or not self.deletion_mark or \
+                # if already deleting comments
+                # or next line is marked for deletion
+                if processing_stack[-1] == LineCheckingState.DELETE or not self.deletion_mark or \
                         next_line and re.sub(r"\s*", '', next_line) == self.deletion_mark:
-                    content_stack.append(MultilineState.DELETE)
+                    processing_stack.append(LineCheckingState.DELETE)
                 else:
-                    content_stack.append(MultilineState.COMMENT)
+                    processing_stack.append(LineCheckingState.COMMENT)
             # if multiline comment ended
-            elif self.end_multiline_regex.match(line):
-                prev_state = content_stack.pop()
-                # protection against redundant "%}"
-                if len(content_stack) == 0:
-                    content_stack.append(MultilineState.CODE)
-                if prev_state == MultilineState.DELETE:
+            elif self.end_multiline_regex.match(line) and processing_stack[-1] != LineCheckingState.CODE:
+                prev_state = processing_stack.pop()
+                if prev_state == LineCheckingState.DELETE:
                     continue
-                elif prev_state == MultilineState.COMMENT:
+                elif prev_state == LineCheckingState.COMMENT:
                     comment_line_nums.append(out_line_num)
                     out.append(line)
                     continue
 
-            if content_stack[-1] == MultilineState.DELETE:
+            if processing_stack[-1] == LineCheckingState.DELETE:
                 continue
-            elif content_stack[-1] == MultilineState.COMMENT:
+            elif processing_stack[-1] == LineCheckingState.COMMENT:
                 comment_line_nums.append(out_line_num)
             out.append(line)
 
         return out, comment_line_nums
 
     def strip_line_comments(self, istr_lines: list, line_nums_to_omit: list) -> list:
+        """returns list of code lines with stripped comments"""
 
         out = []
+        # if deletion mark specified, check for '%' followed
+        # directly by the mark and space
+        # otherwise match every comment
         if self.deletion_mark:
             deletion_mark = '%' + self.deletion_mark + ' '
         else:
@@ -143,7 +150,9 @@ class MatlabCommentStripper:
             comment = match.group("comment")
 
             # if comment starts with deletion mark, delete it
-            if comment[:len(deletion_mark)] == deletion_mark:
+            # also check if marked comment is empty (ignore space)
+            if comment[:len(deletion_mark)] == deletion_mark \
+                    or comment[:len(comment) - 1] == deletion_mark[:len(comment) - 1]:
                 # if comment is deleted and there is no code, don't append line
                 if re.match(r"^\s*$", code):
                     continue
@@ -186,7 +195,8 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--ofile", metavar="OutputFile",
                         help="specify output file; prints result if absent")
     parser.add_argument("-m", "--mark", metavar="DeletionMark",
-                        help="specify mark which will qualify a comment to be deleted; "
+                        help="specify mark which will qualify a comment to be deleted, "
+                        "this mark must be followed by space in code; "
                         "deletes all comments if absent")
     if len(sys.argv) < 2:
         parser.print_help()

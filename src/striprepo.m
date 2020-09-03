@@ -1,25 +1,23 @@
 function [affectedFiles, errors] = striprepo(deletionMark)
-%STRIPREPO Delete comments from m-files tracked by git repository
-%   [AFFECTEDFILES, ERRORS] = STRIPREPO() deletes all comments from
-%   current repository. AFFECTEDFILES is a cell array containing paths to
-%   affected files, which are relative to the root path.
-%
-%   [AFFECTEDFILES, ERRORS] = STRIPREPO(DELETIONMARK) deletes all comments
-%   from current repository that start with DELETIONMARK. Calling this
-%   function with empty string is equal to STRIPREPO()
+%STRIPREPO Delete comments from m-files tracked by git
+%   [AFFECTEDFILES, ERRORS] = STRIPREPO(DELETIONMARK) deletes all comments 
+%   from current repository that start with DELETIONMARK. Using empty
+%   string will delete all comments. AFFECTEDFILES is a cell array 
+%   containing paths to affected files, which are relative to the root 
+%   path. ERRORS is a cell array containing error descriptions.
 %   
 %   NOTE: In order to use this function, current working directory or one
 %   of directories above must contain .git directory
 %   
 %   See also STRIPFILE
 
+    % check if git is installed
     [gitNotFound, ~] = system('git --version');
     if gitNotFound
-        error("Git not found");
-    elseif nargin == 0
-        deletionMark = "";
+        error("Git not found"); 
     end
-    if ~isstring(deletionMark) && ~ischar(deletionMark)
+    % argument validation
+    if ~isstring(deletionMark) && ~ischar(deletionMark) 
         error("Passed argument is not a string");
     end
     
@@ -50,7 +48,6 @@ function [affectedFiles, errors] = striprepo(deletionMark)
     else
         mfiles = mfiles(1:mfilesCount);
     end
-    
     % try to strip every file
     affectedFiles = cell(1, mfilesCount);
     affectedLength = 0;
