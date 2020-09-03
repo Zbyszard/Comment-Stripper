@@ -7,6 +7,13 @@ A small set of tools for deleting specific comments in MATLAB/Octave code.
 * python
 * git - required for function `striprepo`
 
+## Setup
+
+Download repository and add src directory to MATLAB's path:
+```Matlab
+addpath path/to/Matlab-Comment-Stripper/src
+```
+
 ## Usage
 
 ### In MATLAB
