@@ -5,7 +5,7 @@ function [status, errmsg] = stripfile(inputFile, outputFile, deletionMark)
 %   STATUS different than 0 signals an error.
 %   
 %   STATUS = STRIPFILE(IFILE, OFILE, DELMARK) deletes only comments 
-%   which start with DELMARK and space. 
+%   which start with DELMARK.
 %   For multiline comments: deletes comments containing only DELMARK
 %   in first comment line. Works for nested multiline comments. 
 %   Using empty string as DELMARK is equal to STRIPFILE(IFILE, OFILE).

@@ -1,10 +1,13 @@
-function [affectedFiles, errors] = striprepo(deletionMark)
+function [affectedFiles, errors] = striprepo(deletionMark, showProgress)
 %STRIPREPO Delete comments from m-files tracked by git
 %   [AFFECTEDFILES, ERRORS] = STRIPREPO(DELETIONMARK) deletes all comments 
 %   from current repository that start with DELETIONMARK. Using empty
 %   string will delete all comments. AFFECTEDFILES is a cell array 
 %   containing paths to affected files, which are relative to the root 
 %   path. ERRORS is a cell array containing error descriptions.
+%   
+%   [AFFECTEDFILES, ERRORS] = STRIPREPO(DELETIONMARK, SHOWPROGRESS) shows
+%   progress in command window if SHOWPROGRESS is true or different than 0
 %   
 %   NOTE: In order to use this function, current working directory or one
 %   of directories above must contain .git directory
@@ -16,9 +19,16 @@ function [affectedFiles, errors] = striprepo(deletionMark)
     if gitNotFound
         error("Git not found"); 
     end
+    if nargin < 2
+        showProgress = 0;
+    end
     % argument validation
     if ~isstring(deletionMark) && ~ischar(deletionMark) 
         error("Passed argument is not a string");
+    end
+    if ~isnumeric(showProgress) && ~islogical(showProgress)...
+            || length(showProgress) > 1 
+        error("Second argument is not numeric or logical");
     end
     
     % get absolute path to the root of repository
@@ -48,12 +58,18 @@ function [affectedFiles, errors] = striprepo(deletionMark)
     else
         mfiles = mfiles(1:mfilesCount);
     end
-    % try to strip every file
+    
     affectedFiles = cell(1, mfilesCount);
     affectedLength = 0;
     errors = cell(1, mfilesCount);
     errorsLength = 0;
-    for ii = 1:mfilesCount     
+    % try to strip every file
+    for ii = 1:mfilesCount
+        if showProgress
+            progress = sprintf('Processed files: %d/%d\n%d errors',...
+                ii - 1, mfilesCount, errorsLength);
+            disp(progress);
+        end
         absolutePath = sprintf('%s/%s', rootPathResult, mfiles{ii});
         [failed, errmsg] = stripfile(absolutePath, absolutePath, deletionMark);
         if failed
@@ -62,6 +78,10 @@ function [affectedFiles, errors] = striprepo(deletionMark)
         else
             affectedFiles{affectedLength + 1} = mfiles{ii};
             affectedLength = affectedLength + 1;
+        end
+        if showProgress
+            % clear progress info; will not work in Octave
+            fprintf(repmat('\b', 1, length(progress) + 1));
         end
     end
     
