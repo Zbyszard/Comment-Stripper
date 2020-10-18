@@ -27,7 +27,7 @@ foo = 'bar'; % another comment
     multiline comment
 %}
 ```
-`>> stripfile('path/to/your/file.m', 'output.m')`
+`>> stripfile('path/to/your/file.m', 'path/to/output.m')`
 ```Matlab
 foo = 'bar'; 
 ```
