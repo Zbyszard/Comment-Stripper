@@ -17,14 +17,20 @@ function [status, errmsg] = stripfile(inputFile, outputFile, deletionMark)
 %   all lines below
 
     % check if python is installed
-    [pythonNotFound, ~] = system('python -V');
+    [pythonNotFound, ~] = system("python -V");
+    python = "python";
+    if pythonNotFound
+        [pythonNotFound, ~] = system("py -V");
+        python = "py";
+    end
     if pythonNotFound
         error("Python not found");
     elseif nargin < 2
         error("Input or output file not specified");
     elseif nargin < 3
-        deletionMark = "";
+        deletionMark = '';
     end
+    deletionMark = char(deletionMark);
     % validate arguments
     args = {inputFile, outputFile, deletionMark};
     for ii = 1:nargin
@@ -38,15 +44,14 @@ function [status, errmsg] = stripfile(inputFile, outputFile, deletionMark)
         error("Python script not found");
     end
     % construct command
-    command = sprintf('python "%s" -i "%s" -o "%s"', scriptPath,...
+    command = sprintf("%s '%s' -i '%s' -o '%s'", python, scriptPath,...
         inputFile, outputFile);
     if ~isempty(deletionMark)
-        if ispc
-            command = sprintf('%s -m "%s"', command, deletionMark);
-        else
-            command = sprintf('%s -m ''%s''', command, deletionMark);
-        end
+        command = sprintf("%s -m '%s'", command, deletionMark);
     end
+    if ispc
+        command = strrep(command, "'", '"');
+    end        
     % execute command
     [status, errmsg] = system(command);
 end

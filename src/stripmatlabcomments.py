@@ -1,7 +1,6 @@
 import sys
 import argparse
 import re
-from enum import Enum
 
 
 def main(arg_obj):
@@ -50,7 +49,7 @@ line_regex_str = r"""
     """
 # delete white spaces and comments from regex
 line_regex_str = re.sub(r"(\s*)|(\(\?\#.*\))", '',
-                        line_regex_str)
+                           line_regex_str)
 line_regex = re.compile(line_regex_str)
 
 # match multiline comment start or end and nothing more except white spaces
@@ -58,7 +57,7 @@ start_multiline_regex = re.compile(r"^\s*%{\s*\n?$")
 end_multiline_regex = re.compile(r"^\s*%}\s*\n?$")
 
 
-class LineCheckingState(Enum):
+class LineCheckingState:
     """enum class for processing multiline comments"""
     # currently processing code
     CODE = 0
@@ -73,16 +72,16 @@ class MatlabCommentStripper:
     end_multiline_regex = end_multiline_regex
     line_regex = line_regex
 
-    def __init__(self, deletion_mark: str):
+    def __init__(self, deletion_mark):
         self.deletion_mark = deletion_mark
 
-    def strip_lines(self, istr_lines: list) -> str:
+    def strip_lines(self, istr_lines):
         istr_lines, ml_comment_lines = self.strip_multiline_comments(
             istr_lines)
         istr_lines = self.strip_line_comments(istr_lines, ml_comment_lines)
         return ''.join(istr_lines)
 
-    def strip_multiline_comments(self, istr_lines: list) -> (list, list):
+    def strip_multiline_comments(self, istr_lines):
         """returns list of lines and a list of numbers of lines being multiline comments"""
         
         out = []
@@ -129,7 +128,7 @@ class MatlabCommentStripper:
 
         return out, comment_line_nums
 
-    def strip_line_comments(self, istr_lines: list, line_nums_to_omit: list) -> list:
+    def strip_line_comments(self, istr_lines, line_nums_to_omit):
         """returns list of code lines with stripped comments"""
 
         out = []
@@ -166,7 +165,7 @@ class MatlabCommentStripper:
 del line_regex_str, line_regex, start_multiline_regex, end_multiline_regex
 
 
-def read_from(file_path: str) -> str:
+def read_from(file_path):
     try:
         with open(file_path, 'r') as file:
             return file.readlines()
@@ -175,7 +174,7 @@ def read_from(file_path: str) -> str:
         exit(e.errno)
 
 
-def write_to(file_path: str, content) -> None:
+def write_to(file_path, content):
     try:
         with open(file_path, 'w') as file:
             file.write(content)
