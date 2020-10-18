@@ -31,11 +31,18 @@ function [status, errmsg] = stripfile(inputFile, outputFile, deletionMark)
         deletionMark = '';
     end
     deletionMark = char(deletionMark);
+    environment = ver;
+    isMatlab = strcmp(environment.Name, 'MATLAB');
     % validate arguments
     args = {inputFile, outputFile, deletionMark};
     for ii = 1:nargin
-        if ~isstring(args{ii}) && ~ischar(args{ii})
-            error("Argument %d is not a string", ii);
+        isString = ischar(args{ii});
+        % additional check for MATLAB strings
+        if isMatlab && ~isString
+            isString = isstring(args{ii});
+        end
+        if ~isString
+             error("Argument %d is not a string", ii);
         end
     end
     % find absolute path to python script
