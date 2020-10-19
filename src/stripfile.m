@@ -24,7 +24,8 @@ function [status, errmsg] = stripfile(inputFile, outputFile, deletionMark)
         python = "py";
     end
     if pythonNotFound
-        error("Python not found");
+        error(['Python not found. Make sure python is installed or '...
+            'adjust "python" variable in this file']);
     elseif nargin < 2
         error("Input or output file not specified");
     elseif nargin < 3

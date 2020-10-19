@@ -5,7 +5,7 @@ for ii = 1:nargin
     if ~isstring(args{ii}) && ~ischar(args{ii}) 
         error("Argument %d is not a string", ii); %$2 comment
 	end %$# comment
-end
+end %!@#$%^&*()
 
 %{
 	ml-1
