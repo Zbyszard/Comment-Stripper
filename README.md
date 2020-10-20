@@ -84,3 +84,7 @@ optional arguments:
 ## More
 
 See function descriptions for more info.
+
+## Credits
+
+[Peter John Acklam](https://github.com/pjacklam) - main regular expression is based on the one provided in [% MATLAB Comment Stripping Toolbox](https://www.mathworks.com/matlabcentral/fileexchange/4645-matlab-comment-stripping-toolbox)

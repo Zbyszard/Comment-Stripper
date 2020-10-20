@@ -28,7 +28,7 @@ str4 = sprintf('%s -m ''%s''', str1, str2); %q test quotes
 
 %{
 	!!!
-	all lines of an unterminated multiline comment will be deleted
+	all lines of an unterminated grouped comment will be deleted
 	!!!
 	command = sprintf("%s '%s' -i '%s' -o '%s'", python, scriptPath,...
         inputFile, outputFile);
