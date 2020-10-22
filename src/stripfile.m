@@ -33,7 +33,8 @@ function [status, errmsg] = stripfile(inputFile, outputFile, deletionMark)
     end
     deletionMark = char(deletionMark);
     environment = ver;
-    isMatlab = strcmp(environment.Name, 'MATLAB');
+    environmentName = environment.Name;
+    isMatlab = strcmp(environmentName, 'MATLAB');
     % validate arguments
     args = {inputFile, outputFile, deletionMark};
     for ii = 1:nargin
