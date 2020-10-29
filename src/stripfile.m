@@ -17,10 +17,10 @@ function [status, errmsg] = stripfile(inputFile, outputFile, deletionMark)
 %   all lines below
 
     % check if python is installed
-    [pythonNotFound, ~] = system("python -V");
+    [pythonNotFound, ~] = system("python -V 2>&1");
     python = "python";
     if pythonNotFound
-        [pythonNotFound, ~] = system("py -V");
+        [pythonNotFound, ~] = system("py -V 2>&1");
         python = "py";
     end
     if pythonNotFound
@@ -32,15 +32,14 @@ function [status, errmsg] = stripfile(inputFile, outputFile, deletionMark)
         deletionMark = '';
     end
     deletionMark = char(deletionMark);
-    environment = ver;
-    environmentName = environment.Name;
-    isMatlab = strcmp(environmentName, 'MATLAB');
+    
+    isOctave = exist('OCTAVE_VERSION','builtin');
     % validate arguments
     args = {inputFile, outputFile, deletionMark};
     for ii = 1:nargin
         isString = ischar(args{ii});
         % additional check for MATLAB strings
-        if isMatlab && ~isString
+        if ~isOctave && ~isString
             isString = isstring(args{ii});
         end
         if ~isString
@@ -56,7 +55,7 @@ function [status, errmsg] = stripfile(inputFile, outputFile, deletionMark)
     command = sprintf("%s '%s' -i '%s' -o '%s'", python, scriptPath,...
         inputFile, outputFile);
     if ~isempty(deletionMark)
-        command = sprintf("%s -m '%s'", command, deletionMark);
+        command = sprintf("%s -m '%s' 2>&1", command, deletionMark);
     end
     if ispc
         command = strrep(command, "'", '"');

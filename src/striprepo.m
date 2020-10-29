@@ -15,7 +15,7 @@ function [affectedFiles, errors] = striprepo(deletionMark, showProgress)
 %   See also STRIPFILE
 
     % check if git is installed
-    [gitNotFound, ~] = system('git --version');
+    [gitNotFound, ~] = system('git --version 2>&1');
     if gitNotFound
         error("Git not found"); 
     end
@@ -33,8 +33,8 @@ function [affectedFiles, errors] = striprepo(deletionMark, showProgress)
     
     % get absolute path to the root of repository
     % and file paths relative to it
-    [gitRootError, rootPathResult] = system("git rev-parse --show-toplevel");
-    [gitError, gitResult] = system("git ls-tree --full-tree -r --name-only HEAD");
+    [gitRootError, rootPathResult] = system("git rev-parse --show-toplevel 2>&1");
+    [gitError, gitResult] = system("git ls-tree --full-tree -r --name-only HEAD 2>&1");
     if gitRootError
         error(rootPathResult);
     elseif gitError
@@ -64,11 +64,13 @@ function [affectedFiles, errors] = striprepo(deletionMark, showProgress)
     errors = cell(1, mfilesCount);
     errorsLength = 0;
     % try to strip every file
+    if showProgress
+            clc;
+    end
     for ii = 1:mfilesCount
         if showProgress
-            progress = sprintf('Processed files: %d/%d\n%d errors',...
+            fprintf('Processed files: %d/%d\n%d errors',...
                 ii - 1, mfilesCount, errorsLength);
-            disp(progress);
         end
         absolutePath = sprintf('%s/%s', rootPathResult, mfiles{ii});
         [failed, errmsg] = stripfile(absolutePath, absolutePath, deletionMark);
@@ -80,8 +82,7 @@ function [affectedFiles, errors] = striprepo(deletionMark, showProgress)
             affectedLength = affectedLength + 1;
         end
         if showProgress
-            % clear progress info; will not work in Octave
-            fprintf(repmat('\b', 1, length(progress) + 1));
+            clc;
         end
     end
     
