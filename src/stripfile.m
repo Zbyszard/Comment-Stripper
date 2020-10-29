@@ -55,11 +55,12 @@ function [status, errmsg] = stripfile(inputFile, outputFile, deletionMark)
     command = sprintf("%s '%s' -i '%s' -o '%s'", python, scriptPath,...
         inputFile, outputFile);
     if ~isempty(deletionMark)
-        command = sprintf("%s -m '%s' 2>&1", command, deletionMark);
+        command = sprintf("%s -m '%s'", command, deletionMark);
     end
     if ispc
         command = strrep(command, "'", '"');
-    end        
+    end
+    command = strcat(command, " 2>&1");
     % execute command
     [status, errmsg] = system(command);
 end
