@@ -12,7 +12,7 @@ function [status, errmsg] = stripfile(inputFile, outputFile, deletionMark)
     end
     text = fscanf(fid, '%c');
     fclose(fid);
-    lines = strsplit(text, '\n', 'CollapseDelimiters', false);
+    lines = regexp(text, '[^\n]*\n?', 'match');
     [lines, groupCommentLineNums] = stripgroups(lines, deletionMark);
     for ii = 1:length(lines)
         if sum(ii == groupCommentLineNums) == 1

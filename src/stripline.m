@@ -30,7 +30,7 @@ function result = stripline(line, deletionMark)
                  '      )                 ' ...
                  '    )*                  ' ...
                  '  )                     ' ...
-                 '([^\n]*)'];
+                 '([^\n]*)(\n)?'];
         regex = strrep(regst, ' ', '');
     end
     
@@ -49,13 +49,14 @@ function result = stripline(line, deletionMark)
     match = regexp(line, regex, 'tokens');        
     code = match{1}{1};
     comment = match{1}{2};
+    newln = match{1}{3};
     
     shouldDelete = deletionMark == "%";
     if ~shouldDelete && length(deletionMark) <= length(comment)
         shouldDelete = strcmp(comment(1:length(deletionMark)), deletionMark);
     end
     if ~shouldDelete && length(deletionMark) - 1 == length(comment)
-        shouldDelete = strcmp(comment(1:length(comment) - 1), ...
+        shouldDelete = strcmp(comment(1:length(comment)), ...
             deletionMark(1:length(deletionMark) - 1));
     end
     if shouldDelete
@@ -66,6 +67,6 @@ function result = stripline(line, deletionMark)
          comment = '';
     end
         
-    result = sprintf('%s%s\n', code, comment);
+    result = sprintf('%s%s%s', code, comment, newln);
     
 end

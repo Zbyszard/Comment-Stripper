@@ -10,6 +10,9 @@ function [out, processedLines] = stripgroups(lines, deletionMark)
     
     for ii = 1:length(lines)
         line = lines{ii};
+        if isempty(regexprep(line, '\s+', '')) && ii == length(lines)
+            break
+        end
         isStart = ~isempty(regexp(line, startReg, 'match', 'once'));
         noDelMark = isempty(deletionMark);
         isStop = ~isempty(regexp(line, stopReg, 'match', 'once'));
