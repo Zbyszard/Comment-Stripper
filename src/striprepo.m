@@ -89,4 +89,3 @@ function [affectedFiles, errors] = striprepo(deletionMark, showProgress)
     affectedFiles = affectedFiles(1:affectedLength);
     errors = errors(1:errorsLength);
 end
-

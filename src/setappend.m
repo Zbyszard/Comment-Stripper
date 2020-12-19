@@ -4,4 +4,3 @@ function set = setappend(set, element)
         set = [set, element];
     end
 end
-
