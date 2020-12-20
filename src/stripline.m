@@ -5,29 +5,29 @@ function result = stripline(line, deletionMark)
         regst = ...
             ['(                   ' ... % code group
              '  ^                 ' ... % line beginning
-             '    (               ' ... % 
-             '      (             ' ... % 
+             '    (?:             ' ... % 
+             '      (?:           ' ... % 
              '        [\]\)}\w.]  ' ... % any char than can be followed by
              '        ''+         ' ... % one or more transpose operators
              '        |           ' ... % or
              '        [^''"%]     ' ... % any char excluding quotes
              '      )+            ' ... % 
              '      |             ' ... % 
-             '      (?<str>       ' ... % string group
-             '        (?<single>  ' ... % single quote string group
+             '      (?:           ' ... % string group
+             '        (?:         ' ... % single quote string group
              '          ''        ' ... % match single quote
              '          [^''\n]*  ' ... % and other signs excluding single quote and new line
-             '          (         ' ... % 
+             '          (?:         ' ... % 
              '            ''''    ' ... % match embedded single quote
              '            [^''\n]*' ... % and other signs excluding single quote and new line
              '          )*        ' ... % 
              '          ''?       ' ... % try to match string ending
              '        )           ' ... % single quote string group end
              '        |           ' ... % 
-             '        (?<double>  ' ... % double quote string group
+             '        (?:         ' ... % double quote string group
              '          "         ' ... % match double quote
              '          [^"\n]*   ' ... % and other signs excluding double quote and new line
-             '          (         ' ... % 
+             '          (?:       ' ... % 
              '            ""      ' ... % match embedded double quote
              '            [^"\n]* ' ... % and other signs excluding double quote and new line
              '          )*        ' ... % 
@@ -46,23 +46,40 @@ function result = stripline(line, deletionMark)
         return;
     end
     
-    if nargin < 2 || deletionMark == ""
+    if nargin < 2 || strcmp(deletionMark, '')
         deletionMark = '%';
     else % transform deletionMark into %deletionMark + space
         deletionMark = strtrim(deletionMark);
         deletionMark = sprintf('%%%s ', deletionMark);
     end
     
-    match = regexp(line, regex, 'tokens');        
-    code = match{1}{1};
-    comment = match{1}{2};
-    newln = match{1}{3};
+    match = regexp(line, regex, 'tokens');
+    match = match{1};
+    if ~exist('OCTAVE_VERSION','builtin')
+        code = match{1};
+        comment = match{2};
+        newln = match{3};
+    else
+        code = ''; comment = ''; newln = '';
+        for ii = 1:length(match)
+            if isempty(match{ii})
+                continue
+            elseif match{ii}(1) == '%'
+                comment = match{ii};
+            elseif match{ii}(1) == char(10)
+                newln = char(10);
+            else
+                code = match{ii};
+            end
+        end
+    end
     
     % there are 3 cases that indicate if comment should be deleted
     % no deletion mark specified
     % comment starts with deletion mark and space
     % comment consists only of deletion mark
-    shouldDelete = deletionMark == "%";
+    shouldDelete = strcmp(deletionMark, '%');
+    
     if ~shouldDelete && length(deletionMark) <= length(comment)
         shouldDelete = strcmp(comment(1:length(deletionMark)), deletionMark);
     elseif ~shouldDelete && length(deletionMark) - 1 == length(comment)
