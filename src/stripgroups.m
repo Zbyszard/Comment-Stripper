@@ -1,15 +1,26 @@
 function [out, processedLines] = stripgroups(lines, deletionMark)
 
-    startReg = '^\s*%{\s*$';
-    stopReg = '^\s*%}\s*$';
+    persistent startReg, persistent stopReg;
+    if isempty(startReg)
+        % line start, whitespaces, %{, whitespaces, line end
+        startReg = '^\s*%{\s*$';
+        % analogously to ^
+        stopReg = '^\s*%}\s*$';
+    end
+    % top of the stack indicates if current line is:
+    % 0 - code
+    % 1 - comment
+    % 2 - comment marked for deletion
     procStack = 0;
     out = cell(1, length(lines));
     out(:) = {''};
     outLength = 0;
+    % numbers of lines in groupped comments
     processedLines = [];
     
     for ii = 1:length(lines)
         line = lines{ii};
+        % break if current line is the last one and is empty
         if isempty(regexprep(line, '\s+', '')) && ii == length(lines)
             break
         end
@@ -25,12 +36,17 @@ function [out, processedLines] = stripgroups(lines, deletionMark)
             outLength = outLength + 1;
         end
         if isStart
+            % there are 3 cases after which next line should be deleted:
+            % current comment block is inside antoher one marked for deletion
+            % no deletion mark was specified
+            % next line contains deletion mark
             if procStack(length(procStack)) == 2 || noDelMark || ...
                     nextLineExists && nextLineIsDelmark
                 procStack = [procStack, 2];
             else
                 procStack = [procStack, 1];
             end
+        % match '%}' only if there is a corresponding '%{' line
         elseif isStop && procStack(length(procStack)) ~= 0
             prev = procStack(length(procStack));
             procStack = procStack(1:length(procStack)-1);

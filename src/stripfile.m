@@ -1,4 +1,17 @@
 function [status, errmsg] = stripfile(inputFile, outputFile, deletionMark)
+%STRIPFILE Delete comments from MATLAB code.
+%   STATUS = STRIPFILE(IFILE, OFILE) deletes all comments from file 
+%   located at IFILE and writes result to file at OFILE
+%   STATUS different than 0 signals an error.
+%   
+%   STATUS = STRIPFILE(IFILE, OFILE, DELMARK) deletes only comments 
+%   which start with DELMARK.
+%   For grouped comments: deletes comments containing only DELMARK
+%   in first comment line. Works for nested groups. 
+%   Using empty string as DELMARK is equal to STRIPFILE(IFILE, OFILE).
+%   
+%   [STATUS, ERRMSG] = STRIPFILE(IFILE, OFILE, DELMARK) returns message
+%   in ERRMSG if an error occured
 
     if nargin < 3
         deletionMark = '';
@@ -12,9 +25,12 @@ function [status, errmsg] = stripfile(inputFile, outputFile, deletionMark)
     end
     text = fscanf(fid, '%c');
     fclose(fid);
+    
+    % regexp is used instead of strsplit in order to keep new line chars
     lines = regexp(text, '[^\n]*(\n|$)', 'match');
     [lines, groupCommentLineNums] = stripgroups(lines, deletionMark);
     for ii = 1:length(lines)
+        % omit groupped comments
         if sum(ii == groupCommentLineNums) == 1
             continue
         end
