@@ -17,7 +17,7 @@ function result = stripline(line, deletionMark)
              '        (?:         ' ... % single quote string group
              '          ''        ' ... % match single quote
              '          [^''\n]*  ' ... % and other signs excluding single quote and new line
-             '          (?:         ' ... % 
+             '          (?:       ' ... % 
              '            ''''    ' ... % match embedded single quote
              '            [^''\n]*' ... % and other signs excluding single quote and new line
              '          )*        ' ... % 
