@@ -12,55 +12,38 @@ function [status, errmsg] = stripfile(inputFile, outputFile, deletionMark)
 %   
 %   [STATUS, ERRMSG] = STRIPFILE(IFILE, OFILE, DELMARK) returns message
 %   in ERRMSG if an error occured
-%   
-%   NOTE: Grouped comments terminated inappropriately can cause loss of
-%   all lines below
 
-    % check if python is installed
-    [pythonNotFound, ~] = system("python -V 2>&1");
-    python = "python";
-    if pythonNotFound
-        [pythonNotFound, ~] = system("py -V 2>&1");
-        python = "py";
-    end
-    if pythonNotFound
-        error(['Python not found. Make sure python is installed or '...
-            'adjust "python" variable in this file']);
-    elseif nargin < 2
-        error("Input or output file not specified");
-    elseif nargin < 3
+    if nargin < 3
         deletionMark = '';
     end
-    deletionMark = char(deletionMark);
     
-    isOctave = exist('OCTAVE_VERSION','builtin');
-    % validate arguments
-    args = {inputFile, outputFile, deletionMark};
-    for ii = 1:nargin
-        isString = ischar(args{ii});
-        % additional check for MATLAB strings
-        if ~isOctave && ~isString
-            isString = isstring(args{ii});
+    [fid, errmsg] = fopen(inputFile, 'r');
+    if fid == -1
+        status = -1;
+        errmsg = sprintf('Cannot read file ''%s'': %s', inputFile, errmsg);
+        return;
+    end
+    text = fscanf(fid, '%c');
+    fclose(fid);
+    
+    % regexp is used instead of strsplit in order to keep new line chars
+    lines = regexp(text, '[^\n]*(\n|$)', 'match');
+    [lines, groupCommentLineNums] = stripgroups(lines, deletionMark);
+    for ii = 1:length(lines)
+        % omit groupped comments
+        if sum(ii == groupCommentLineNums) == 1
+            continue
         end
-        if ~isString
-             error("Argument %d is not a string", ii);
-        end
+        lines{ii} = stripline(lines{ii}, deletionMark);
     end
-    % find absolute path to python script
-    scriptPath = which("stripmatlabcomments.py");
-    if isempty(scriptPath)
-        error("Python script not found");
+    
+    [fid, errmsg] = fopen(outputFile, 'w');
+    if fid == -1
+        status = -1;
+        errmsg = sprintf('Cannot write to ''%s'': %s', outputFile, errmsg);
+        return;
     end
-    % construct command
-    command = sprintf("%s '%s' -i '%s' -o '%s'", python, scriptPath,...
-        inputFile, outputFile);
-    if ~isempty(deletionMark)
-        command = sprintf("%s -m '%s'", command, deletionMark);
-    end
-    if ispc
-        command = strrep(command, "'", '"');
-    end
-    command = strcat(command, " 2>&1");
-    % execute command
-    [status, errmsg] = system(command);
+    fprintf(fid, '%s', strjoin(lines, ''));
+    fclose(fid);
+    status = 0;
 end
