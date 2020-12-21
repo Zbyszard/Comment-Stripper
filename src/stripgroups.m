@@ -30,7 +30,7 @@ function [out, processedLines] = stripgroups(lines, deletionMark)
         nextLineExists = ii < length(lines);
         if nextLineExists
             nextLineIsDelmark = ...
-                strcmp(regexprep(lines{ii + 1}, '\s*', ''), deletionMark);
+                strcmp(strtrim(lines{ii + 1}), deletionMark);
         end
         if procStack(length(procStack)) ~= 2
             outLength = outLength + 1;
