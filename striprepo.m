@@ -1,16 +1,18 @@
-function [affectedFiles, errors] = striprepo(deletionMark, showProgress)
+function [affectedFiles, errors] = striprepo(deletionMark, pathToGitRepo,showProgress)
 %STRIPREPO Delete comments from m-files tracked by git
 %   [AFFECTEDFILES, ERRORS] = STRIPREPO(DELETIONMARK) deletes all comments 
-%   from current repository that start with DELETIONMARK. Using empty
-%   string will delete all comments. AFFECTEDFILES is a cell array 
-%   containing paths to affected files, which are relative to the root 
-%   path. ERRORS is a cell array containing error descriptions.
+%   that start with DELETIONMARK from git repository in current working 
+%   directory. Using empty string will delete all comments.
+%   AFFECTEDFILES is a cell array containing paths to affected files,
+%   which are relative to the repo's root path.
+%   ERRORS is a cell array containing error descriptions.
+%
+%   STRIPREPO(DELETIONMARK, PATHTOGITREPO) processes files from git
+%   repository specified by PATHTOGITREPO. Empty string defaults  to 
+%   repository in current working directory.
 %   
-%   [AFFECTEDFILES, ERRORS] = STRIPREPO(DELETIONMARK, SHOWPROGRESS) shows
+%   STRIPREPO(DELETIONMARK, PATHTOGITREPO, SHOWPROGRESS) shows
 %   progress in command window if SHOWPROGRESS is true or different than 0
-%   
-%   NOTE: In order to use this function, current working directory or one
-%   of directories above must contain .git directory
 %   
 %   See also STRIPFILE
 
@@ -19,12 +21,19 @@ function [affectedFiles, errors] = striprepo(deletionMark, showProgress)
     if gitNotFound
         error("Git not found"); 
     end
-    if nargin < 2
+    if nargin < 3
         showProgress = 0;
     end
     % argument validation
-    if ~isstring(deletionMark) && ~ischar(deletionMark) 
-        error("Passed argument is not a string");
+    if exist('OCTAVE_VERSION','builtin')
+        % Octave doesn't support 'isstring' function
+        if ~ischar(deletionMark) 
+            error("Passed argument is not a string");
+        end
+    else
+        if ~isstring(deletionMark) && ~ischar(deletionMark) 
+            error("Passed argument is not a string");
+        end
     end
     if ~isnumeric(showProgress) && ~islogical(showProgress)...
             || length(showProgress) > 1 
@@ -33,8 +42,27 @@ function [affectedFiles, errors] = striprepo(deletionMark, showProgress)
     
     % get absolute path to the root of repository
     % and file paths relative to it
-    [gitRootError, rootPathResult] = system("git rev-parse --show-toplevel 2>&1");
-    [gitError, gitResult] = system("git ls-tree --full-tree -r --name-only HEAD 2>&1");
+    if nargin < 2 || isempty(char(pathToGitRepo))
+        [gitRootError, rootPathResult] = ...
+            system("git rev-parse --show-toplevel 2>&1");
+        [gitError, gitResult] = ...
+            system("git ls-tree --full-tree -r --name-only HEAD 2>&1");
+    else
+        if ispc
+            rootCommand = ...
+                sprintf('git -C "%s" rev-parse --show-toplevel 2>&1', pathToGitRepo);
+            resultCommand = ...
+                sprintf('git -C "%s" ls-tree --full-tree -r --name-only HEAD 2>&1', pathToGitRepo);
+        else
+            rootCommand = ...
+                sprintf("git -C '%s' rev-parse --show-toplevel 2>&1", pathToGitRepo);
+            resultCommand = ...
+                sprintf("git -C '%s' ls-tree --full-tree -r --name-only HEAD 2>&1", pathToGitRepo);
+        end
+        [gitRootError, rootPathResult] = system(rootCommand);
+        [gitError, gitResult] = system(resultCommand);
+            
+    end
     if gitRootError
         error(rootPathResult);
     elseif gitError
