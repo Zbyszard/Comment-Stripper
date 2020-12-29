@@ -10,12 +10,12 @@ A small set of tools for deleting specific comments in MATLAB/Octave code.
 
 Download repository and add src directory to MATLAB's path:
 ```Matlab
-addpath path/to/Matlab-Comment-Stripper/src
+addpath path/to/Matlab-Comment-Stripper
 ```
 
 ## Usage
 
-### In MATLAB
+### `stripfile`
 
 Use `stripfile(inputFile, outputFile)` to delete all comments from a file.
 
@@ -23,7 +23,7 @@ Use `stripfile(inputFile, outputFile)` to delete all comments from a file.
 % a comment
 foo = 'bar'; % another comment
 %{
-    multiline comment
+    block comment
 %}
 ```
 `>> stripfile('path/to/your/file.m', 'path/to/output.m')`
@@ -37,25 +37,29 @@ Use `stripfile(inputFile, outputFile, deletionMark)` to delete only marked comme
 % a comment
 foo = 'bar'; %?! this one is marked
 %{
-    multiline comment
+    block comment
     %{
-        ?!
+        %?!
         marked and nested comment
     %}
 %}
 ```
 
-`>> stripfile('file.m', 'file.m', '?!')`
+`>> stripfile('file.m', 'file.m', '%?!')`
 
 ```Matlab
 % a comment
 foo = 'bar'; 
 %{
-    multiline comment
+    block comment
 %}
 ```
 
-Use `striprepo(deletionMark)` to delete marked comments from all files within git repository. Make sure current working directory is located at the level of .git directory or lower.
+### `striprepo`
+
+Use `striprepo(deletionMark, pathToGitRepo, showProgress)` to delete marked comments from all m-files within git repository at *pathToGitRepo*. Empty *pathToGitRepo* defaults to current working directory.
+
+`striprepo(deletionMark)` is equivalent to `striprepo(deletionMark, '', '')`.
 
 To delete all comments, use empty string explicitly: `striprepo('')`
 

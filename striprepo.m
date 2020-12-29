@@ -1,15 +1,15 @@
 function [affectedFiles, errors] = striprepo(deletionMark, pathToGitRepo,showProgress)
 %STRIPREPO Delete comments from m-files tracked by git
 %   [AFFECTEDFILES, ERRORS] = STRIPREPO(DELETIONMARK) deletes all comments 
-%   that start with DELETIONMARK from git repository in current working 
+%   that start with DELETIONMARK from the git repository in current working 
 %   directory. Using empty string will delete all comments.
 %   AFFECTEDFILES is a cell array containing paths to affected files,
 %   which are relative to the repo's root path.
 %   ERRORS is a cell array containing error descriptions.
 %
-%   STRIPREPO(DELETIONMARK, PATHTOGITREPO) processes files from git
-%   repository specified by PATHTOGITREPO. Empty string defaults  to 
-%   repository in current working directory.
+%   STRIPREPO(DELETIONMARK, PATHTOGITREPO) processes files from the git
+%   repository specified by PATHTOGITREPO. Empty string defaults to 
+%   current working directory.
 %   
 %   STRIPREPO(DELETIONMARK, PATHTOGITREPO, SHOWPROGRESS) shows
 %   progress in command window if SHOWPROGRESS is true or different than 0

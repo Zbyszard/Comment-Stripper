@@ -48,9 +48,9 @@ function result = stripline(line, deletionMark)
     
     if nargin < 2 || strcmp(deletionMark, '')
         deletionMark = '%';
-    else % transform deletionMark into %deletionMark + space
+    else % transform deletionMark into deletionMark + space
         deletionMark = strtrim(deletionMark);
-        deletionMark = sprintf('%%%s ', deletionMark);
+        deletionMark = sprintf('%s ', deletionMark);
     end
     
     match = regexp(line, regex, 'tokens');
@@ -59,7 +59,7 @@ function result = stripline(line, deletionMark)
         code = match{1};
         comment = match{2};
         newln = match{3};
-    else
+    else 
         code = ''; comment = ''; newln = '';
         for ii = 1:length(match)
             if isempty(match{ii})
@@ -74,7 +74,7 @@ function result = stripline(line, deletionMark)
         end
     end
     
-    % there are 3 cases that indicate if comment should be deleted
+    % there are 3 cases that indicate if comment should be deleted:
     % no deletion mark specified
     % comment starts with deletion mark and space
     % comment consists only of deletion mark

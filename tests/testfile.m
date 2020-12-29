@@ -12,11 +12,11 @@ end %!@#$%^&*()/-+,.[];\<>:{} comment after code
 	deleting this comment will include deleting all nested comment groups in this scope
 	
 	%{
-		ml-2
+		%ml-2
 		marked grouped comments - level 2
 
 		%{
-			ml-3
+			%ml-3
 			marked grouped comments - level 3
 		%}
 	%}
@@ -42,7 +42,7 @@ str16 = sprintf('%s -m "%s"', str1, str2); %q comment after code
 str17 = sprintf('%s -m ''%s''', str1, str2); %q comment after code
 
 %{
-	!!!
+	%!!!
 	all lines of an unterminated grouped comment will be deleted
     
 	command = sprintf("%s '%s' -i '%s' -o '%s'", python, scriptPath,...
