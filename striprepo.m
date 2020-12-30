@@ -93,11 +93,11 @@ function [affectedFiles, errors] = striprepo(deletionMark, pathToGitRepo,showPro
     errorsLength = 0;
     % try to strip every file
     if showProgress
-            clc;
+        clc;
     end
     for ii = 1:mfilesCount
         if showProgress
-            fprintf('Processed files: %d/%d\n%d errors',...
+            fprintf('Processed files: %d/%d\n%d errors\n',...
                 ii - 1, mfilesCount, errorsLength);
         end
         absolutePath = sprintf('%s/%s', rootPathResult, mfiles{ii});

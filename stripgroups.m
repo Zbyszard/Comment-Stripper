@@ -67,3 +67,12 @@ function [out, processedLines] = stripgroups(lines, deletionMark)
     end
     out = out(1:outLength);
 end
+
+% adds element to an array only if it doesn't contain that element
+function set = setappend(set, element)
+
+    if sum(element == set) == 0
+        set = [set, element];
+    end
+end
+
