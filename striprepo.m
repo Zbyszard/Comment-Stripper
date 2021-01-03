@@ -76,7 +76,7 @@ function [affectedFiles, errors] = striprepo(deletionMark, pathToGitRepo,showPro
     mfilesCount = 0;
     % get all m-files (*.m)
     for ii = 1:length(files)
-        if regexp(files{ii}, "^.+\.m$")
+        if regexp(files{ii}, '^.+\.m$')
             mfiles{mfilesCount + 1} = files{ii};
             mfilesCount = mfilesCount + 1;
         end
