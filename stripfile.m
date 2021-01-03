@@ -23,11 +23,23 @@ function [status, errmsg] = stripfile(inputFile, outputFile, deletionMark)
         errmsg = sprintf('Cannot read file ''%s'': %s', inputFile, errmsg);
         return;
     end
-    text = fscanf(fid, '%c');
-    fclose(fid);
+    % Octave loses some special characters while using fscanf on Windows
+    if exist('OCTAVE_VERSION','builtin') && ispc
+        lines = {};
+        while true
+            line = fgetl(fid);
+            if line == -1
+                break;
+            end
+            lines(length(lines) + 1) = sprintf('%s\n', line);
+        end
+    else
+        text = fscanf(fid, '%c');    
+        % regexp is used instead of strsplit in order to keep new line chars
+        lines = regexp(text, '[^\n]*(\n|$)', 'match');
+    end
     
-    % regexp is used instead of strsplit in order to keep new line chars
-    lines = regexp(text, '[^\n]*(\n|$)', 'match');
+    fclose(fid);
     [lines, groupCommentLineNums] = stripgroups(lines, deletionMark);
     for ii = 1:length(lines)
         % omit groupped comments
