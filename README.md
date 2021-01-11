@@ -17,7 +17,7 @@ addpath path/to/Matlab-Comment-Stripper
 
 ### `striprepo`
 
-Use `striprepo(deletionMark, pathToGitRepo, showProgress)` to delete specified comments from all m-files within git repository at *pathToGitRepo* (either relative to current or to absolute path). Empty *pathToGitRepo* defaults to current working directory. Argument *showProgress* different than 0 will print current number or processed files.
+Use `striprepo(deletionMark, pathToGitRepo, showProgress)` to delete specified comments from all m-files within git repository at *pathToGitRepo* (either relative to current or to absolute path). Empty *pathToGitRepo* defaults to current working directory. Argument *showProgress* different than 0 will print current number of processed files.
 
 `striprepo(deletionMark)` is equivalent to `striprepo(deletionMark, '', 0)`.
 
