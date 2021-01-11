@@ -61,7 +61,7 @@ Use `striprepo('')` to get rid of all the comments:
 
 `>> [files, errors] = striprepo('')`
 
-There is no comments in any of your files now.
+There is not a single comment in any of your files now.
 
 ```Matlab
 foo = 'bar'; 
