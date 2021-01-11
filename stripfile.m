@@ -1,19 +1,22 @@
-function [status, errmsg] = stripfile(inputFile, outputFile, deletionMark)
-%STRIPFILE Delete comments from MATLAB code.
-%   STATUS = STRIPFILE(IFILE, OFILE) deletes all comments from file 
-%   located at IFILE and writes result to file at OFILE
+function [status, errmsg] = stripfile(deletionMark, inputFile, outputFile)
+%STRIPFILE Delete specified comments from MATLAB/Octave code.
+%   [STATUS, ERRMSG] = STRIPFILE(DELETIONMARK, IFILEPATH) deletes comments
+%   which start with DELETIONMARK from file located at IFILEPATH.
+%   For block comments: deletes comments containing only DELETIONMARK
+%   or whitespace chars in the first comment line after '%{'.
+%   Works for nested blocks.
+%   To delete all comments use empty string or char vector.
 %   STATUS different than 0 signals an error.
+%   ERRMSG contains error message if an error occured.
 %   
-%   STATUS = STRIPFILE(IFILE, OFILE, DELMARK) deletes only comments 
-%   which start with DELMARK.
-%   For grouped comments: deletes comments containing only DELMARK
-%   in first comment line. Works for nested groups. 
-%   Using empty string as DELMARK is equal to STRIPFILE(IFILE, OFILE).
-%   
-%   [STATUS, ERRMSG] = STRIPFILE(IFILE, OFILE, DELMARK) returns message
-%   in ERRMSG if an error occured
+%   STRIPFILE(DELETIONMARK, IFILEPATH, OFILEPATH) writes result to
+%   OFILEPATH.
 
     if nargin < 3
+        outputFile = inputFile;
+    end
+    
+    if isempty(deletionMark)
         deletionMark = '';
     end
     

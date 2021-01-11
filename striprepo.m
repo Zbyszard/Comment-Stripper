@@ -1,5 +1,5 @@
-function [affectedFiles, errors] = striprepo(deletionMark, pathToGitRepo,showProgress)
-%STRIPREPO Delete comments from m-files tracked by git
+function [affectedFiles, errors] = striprepo(deletionMark, pathToGitRepo, showProgress)
+%STRIPREPO Delete comments from m-files tracked by Git
 %   [AFFECTEDFILES, ERRORS] = STRIPREPO(DELETIONMARK) deletes all comments 
 %   that start with DELETIONMARK from the git repository in current working 
 %   directory. Using empty string will delete all comments.
@@ -25,15 +25,8 @@ function [affectedFiles, errors] = striprepo(deletionMark, pathToGitRepo,showPro
         showProgress = 0;
     end
     % argument validation
-    if exist('OCTAVE_VERSION','builtin')
-        % Octave doesn't support 'isstring' function
-        if ~ischar(deletionMark) 
-            error("Passed argument is not a string");
-        end
-    else
-        if ~isstring(deletionMark) && ~ischar(deletionMark) 
-            error("Passed argument is not a string");
-        end
+    if isempty(deletionMark)
+        deletionMark = '';
     end
     if ~isnumeric(showProgress) && ~islogical(showProgress)...
             || length(showProgress) > 1 
@@ -101,7 +94,7 @@ function [affectedFiles, errors] = striprepo(deletionMark, pathToGitRepo,showPro
                 ii - 1, mfilesCount, errorsLength);
         end
         absolutePath = sprintf('%s/%s', rootPathResult, mfiles{ii});
-        [failed, errmsg] = stripfile(absolutePath, absolutePath, deletionMark);
+        [failed, errmsg] = stripfile(deletionMark, absolutePath);
         if failed
             errors{errorsLength + 1} = sprintf('%s: %s', mfiles{ii}, errmsg);
             errorsLength = errorsLength + 1;

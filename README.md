@@ -15,53 +15,83 @@ addpath path/to/Matlab-Comment-Stripper
 
 ## Usage
 
-### `stripfile`
+### `striprepo`
 
-Use `stripfile(inputFile, outputFile)` to delete all comments from a file.
+Use `striprepo(deletionMark, pathToGitRepo, showProgress)` to delete specified comments from all m-files within git repository at *pathToGitRepo* (either relative or absolute path). Empty *pathToGitRepo* defaults to current working directory.
 
-```Matlab
-% a comment
-foo = 'bar'; % another comment
-%{
-    block comment
-%}
-```
-`>> stripfile('path/to/your/file.m', 'path/to/output.m')`
-```Matlab
-foo = 'bar'; 
-```
+`striprepo(deletionMark)` is equivalent to `striprepo(deletionMark, '', 0)`.
 
-Use `stripfile(inputFile, outputFile, deletionMark)` to delete only marked comments.
+To delete all comments, use empty string explicitly: `striprepo('')`
+
+Note: if you don't use '%' sign at the beginning of *deletionMark*, only block comments will be affected.
+
+### Examples:
+
+Let's assume that this is one of many files in your repository.
 
 ```Matlab
 % a comment
 foo = 'bar'; %?! this one is marked
+
 %{
     block comment
     %{
         %?!
-        marked and nested comment
+        marked and nested block
     %}
 %}
+a = 1 + 2; % one plus two
 ```
 
-`>> stripfile('file.m', 'file.m', '%?!')`
+Use `striprepo('%?!')` cut out unwanted comments.
+
+`>> [files, errors] = striprepo('%?!')`
 
 ```Matlab
 % a comment
 foo = 'bar'; 
+
 %{
     block comment
 %}
+a = 1 + 2; % one plus two
 ```
 
-### `striprepo`
+Use `striprepo('')` to get rid of all the comments:
 
-Use `striprepo(deletionMark, pathToGitRepo, showProgress)` to delete marked comments from all m-files within git repository at *pathToGitRepo*. Empty *pathToGitRepo* defaults to current working directory.
+`>> [files, errors] = striprepo('')`
 
-`striprepo(deletionMark)` is equivalent to `striprepo(deletionMark, '', '')`.
+There is no comments in any of your files now.
 
-To delete all comments, use empty string explicitly: `striprepo('')`
+```Matlab
+foo = 'bar'; 
+
+a = 1 + 2; 
+```
+
+### `stripfile`
+
+Use `stripfile(deletionMark, inputFile)` to delete specified comments from a file.
+
+Use `stripfile(deletionMark, inputFile, outputFile)` to write result to another file.
+
+### Example:
+
+Let's say your working directory is `/home/project/src` and you also have `/home/project/copy` directory.
+
+`>> [status, errorMsg] = stripfile('%@', 'file.m', '../copy/filecopy.m')`
+
+```Matlab
+% hello
+foo = 'bar'; %@ temp comment
+```
+
+The file at `/home/project/copy` directory:
+
+```Matlab
+% hello
+foo = 'bar'; 
+```
 
 ## More
 
@@ -69,4 +99,4 @@ See function descriptions for more info.
 
 ## Credits
 
-[Peter John Acklam](https://github.com/pjacklam) - main regular expression is based on the one provided in [% MATLAB Comment Stripping Toolbox](https://www.mathworks.com/matlabcentral/fileexchange/4645-matlab-comment-stripping-toolbox)
+[Peter John Acklam](https://github.com/pjacklam) - main regular expression is based on the one used in [% MATLAB Comment Stripping Toolbox](https://www.mathworks.com/matlabcentral/fileexchange/4645-matlab-comment-stripping-toolbox)

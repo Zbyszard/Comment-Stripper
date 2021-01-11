@@ -7,7 +7,7 @@ location = what('tests');
 path = location.path;
 
 % strip all comments
-[status, err] = stripfile(sprintf("%s/%s", path, "testfile.m"), ...
+[status, err] = stripfile('', sprintf("%s/%s", path, "testfile.m"), ...
         sprintf("%s/out-deleted-all.m", path));
 
 errorsLength = 0;
@@ -19,9 +19,9 @@ end
 
 % use deletion marks
 for ii = 1:length(testingMarks)
-    [status, err] = stripfile(sprintf("%s/%s", path, "testfile.m"), ...
-        sprintf("%s/out-%s.m", path, num2str(ii)),...
-        testingMarks{ii});
+    [status, err] = stripfile(testingMarks{ii}, ...
+        sprintf("%s/%s", path, "testfile.m"), ...
+        sprintf("%s/out-%s.m", path, num2str(ii)));
     if status
         errorsLength = errorsLength + 1;
         errors{errorsLength} = err;
