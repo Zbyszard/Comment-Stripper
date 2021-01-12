@@ -77,16 +77,18 @@ Use `stripfile(deletionMark, inputFile, outputFile)` to write result to another 
 
 ### Example:
 
-Let's say your working directory is `/home/project/src` and you also have `/home/project/copy` directory.
+Let's say your working directory is `/home/project/src` and you also have `/home/project/copy` directory. You can make a copy of a file and drop some comments.
 
-`>> [status, errorMsg] = stripfile('%@', 'file.m', '../copy/filecopy.m')`
+The file at `/home/project/src`:
 
 ```Matlab
 % hello
 foo = 'bar'; %@ temp comment
 ```
 
-The file at `/home/project/copy` directory:
+`>> [status, errorMsg] = stripfile('%@', 'file.m', '../copy/filecopy.m')`
+
+The file at `/home/project/copy`:
 
 ```Matlab
 % hello
