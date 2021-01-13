@@ -75,6 +75,8 @@ function [affectedFiles, errors] = striprepo(deletionMark, pathToGitRepo, showPr
         end
     end
     if mfilesCount == 0
+        affectedFiles = {};
+        errors = {};
         return;
     else
         mfiles = mfiles(1:mfilesCount);
