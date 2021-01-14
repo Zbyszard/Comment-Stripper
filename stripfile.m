@@ -16,7 +16,7 @@ function [status, errmsg] = stripfile(deletionMark, inputFile, outputFile)
         outputFile = inputFile;
     end
     
-    if isempty(deletionMark)
+    if strcmp(char(deletionMark), '')
         deletionMark = '';
     end
     

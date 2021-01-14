@@ -25,7 +25,7 @@ function [affectedFiles, errors] = striprepo(deletionMark, pathToGitRepo, showPr
         showProgress = 0;
     end
     % argument validation
-    if isempty(deletionMark)
+    if strcmp(char(deletionMark), '')
         deletionMark = '';
     end
     if ~isnumeric(showProgress) && ~islogical(showProgress)...
