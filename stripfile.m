@@ -37,7 +37,7 @@ function [status, errmsg] = stripfile(deletionMark, inputFile, outputFile)
             lines(length(lines) + 1) = sprintf('%s\n', line);
         end
     else
-        text = fscanf(fid, '%c');    
+        text = regexprep(fscanf(fid, '%c'), '\r\n', '\n');
         % regexp is used instead of strsplit in order to keep new line chars
         lines = regexp(text, '[^\n]*(\n|$)', 'match');
     end
