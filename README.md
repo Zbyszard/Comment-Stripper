@@ -27,7 +27,7 @@ Note: if you don't use '%' sign at the beginning of *deletionMark*, only block c
 
 ### Examples:
 
-Let's assume that this is one of many files in your repository.
+Assume that this is one of many files in your repository.
 
 ```Matlab
 % a comment
