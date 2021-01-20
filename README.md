@@ -1,3 +1,5 @@
+[![View MATLAB Repo Comment Stripper on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/86019-matlab-repo-comment-stripper)
+
 # Matlab Comment Stripper
 
 A small set of tools for deleting specific comments in MATLAB/Octave code.
